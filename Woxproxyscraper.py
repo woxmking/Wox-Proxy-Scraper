@@ -3,13 +3,12 @@ from bs4 import BeautifulSoup
 import re
 import time
 
-# Configurar os headers comum para evitar problemas
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
 }
 
 def salvar_proxy_em_arquivo(proxy, tipo):
-    # Determinar o formato de saída
     if tipo == 'socks5':
         arquivo = f'socks5.txt'
         formato = '(IP):%d:(PORT)'
@@ -17,15 +16,14 @@ def salvar_proxy_em_arquivo(proxy, tipo):
         arquivo = f'https.txt'
         formato = '%s:%d' % proxy['url']
     else:
-        return False  # Tipo não suportado
+        return False 
 
-    # Escrever no arquivo
     with open(arquivo, 'a') as arquivo_texto:
         if isinstance(proxy, dict):
             conteúdo = formato % (proxy['ip'], proxy['port'])
             arquivo_texto.write(f'{conteúdo}\n')
         else:
-            return False  # Dados inválidos
+            return False  
 
 def pegar_proxies_do_site(url, tipo):
     try:
@@ -40,7 +38,6 @@ def pegar_proxies_do_site(url, tipo):
             raise Exception(f'Não foram encontrados proxies do tipo {tipo}')
 
         for proxy in proxies:
-            # Extração de informações
             info = []
             for tag in proxy.find_all('span'):
                 text = tag.get_text()
@@ -51,14 +48,14 @@ def pegar_proxies_do_site(url, tipo):
                     port = int(re.search(r'\d+', text).group())
                     info.append(('port', port))
 
-            # Salvar nos arquivos
+            
             salvar_proxy_em_arquivo({'url': f'{info[0][1]}:{info[1][1]}', 'ip': info[0][1], 'port': info[1][1]}, tipo)
 
     except Exception as e:
         print(f'Erro ao pegar proxies do site: {e}')
         return False
 
-# URLS dos sites de proxies (adicione mais se necessário)
+
 sites = [
     ('https://www.proxyNova.com', 'proxy-list'),
     ('https://www.sslproxies.org', 'https-proxies'),
